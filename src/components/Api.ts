@@ -5,7 +5,7 @@ const api = axios.create({
     baseURL: 'http://localhost:8080/api',
     withCredentials: true,
     headers: {
-        accept: 'application/hal+json'
+        accept: 'application/hal+json',
     }
 })
 
@@ -23,7 +23,7 @@ interface LoadEmployee {
     employees: Employee[],
 }
 
-export async function loadEmployees(): Promise<LoadEmployee> {
+export async function loadFromServer(): Promise<LoadEmployee> {
     const result: LoadEmployee = {
         links: {},
         properties: {},
@@ -39,7 +39,13 @@ export async function loadEmployees(): Promise<LoadEmployee> {
         }
     })
     result.properties = res_profile.data.properties
-    result.employees = await navigate('/employees?size=3')
+    for(const emp of res_employees.data._embedded.employees) {
+        result.employees.push({
+            ...emp,
+            self: emp._links.self.href
+        })
+    }
+    update_etag(result.employees)
     return result
 }
 
@@ -47,6 +53,16 @@ export async function navigate(url: string): Promise<Employee[]> {
     const res = await api.get(url)
 
     return []
+}
+
+async function update_etag(employees: Employee[]) {
+    await Promise.all(employees.map(emp => {
+        api
+        .get(emp.self)
+        .then(res => {
+            emp.etag = res.headers.etag
+        })
+    }))
 }
 
 export default api

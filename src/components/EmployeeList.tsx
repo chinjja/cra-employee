@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import api, { loadEmployees } from './Api';
+import api, { loadFromServer } from './Api';
 import { useHistory } from 'react-router';
 import EmployeeView from './EmployeeView'
 import { Employee } from './Types';
@@ -13,7 +13,6 @@ const View = () => {
         api.get('/employees?size=3')
         .then(res => {
             setEmployees(res.data._embedded.employees)
-            console.log(res.data)
         })
         .catch(reason => {
             if(reason.response.status === 401) {
@@ -42,7 +41,7 @@ const View = () => {
                 </tbody>
             </table>
             <button onClick={e=>{
-                loadEmployees()
+                loadFromServer()
             }}>Load</button>
         </div>
     )
