@@ -22,7 +22,7 @@ const View = () => {
     }, [history]);
 
     const employee_list = employees.map((emp, idx) => 
-        <EmployeeView key={idx} employee={emp}/>
+        <EmployeeView key={idx} employee={emp} onClick={e=>console.log(e)}/>
     )
     return (
         <div>
